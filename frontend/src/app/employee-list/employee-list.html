@@ -1,0 +1,13 @@
+<div class="employee-container">
+  <h1 class="title">Employee Directory</h1>
+  <div class="employee-grid">
+    <div class="employee-card" *ngFor="let employee of employees">
+      <div class="employee-avatar">{{ employee.name.charAt(0) }}</div>
+      <div class="employee-info">
+        <h3 class="employee-name">{{ employee.name }}</h3>
+        <p class="employee-designation">{{ employee.designation }}</p>
+        <span class="employee-department">{{ employee.department }}</span>
+      </div>
+    </div>
+  </div>
+</div>
