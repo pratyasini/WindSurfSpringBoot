@@ -131,7 +131,7 @@ export default function Dashboard() {
             View all
           </Link>
         </div>
-        <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+        <div className="overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
           {recent.length === 0 ? (
             <p className="p-6 text-sm text-slate-500">No transactions yet.</p>
           ) : (
