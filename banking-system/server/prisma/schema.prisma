@@ -1,0 +1,69 @@
+// Prisma schema for the Basic Banking System
+// Relations: User -> Accounts -> Transactions
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER_IN
+  TRANSFER_OUT
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         Role      @default(USER)
+  accounts     Account[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Account {
+  id                   String        @id @default(uuid())
+  accountNumber        String        @unique
+  // Balance stored in minor units (cents) to avoid floating point errors.
+  balance              BigInt        @default(0)
+  currency             String        @default("USD")
+  owner                User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId              String
+  transactions         Transaction[] @relation("AccountTransactions")
+  counterpartTransfers Transaction[] @relation("CounterpartAccount")
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@index([ownerId])
+}
+
+model Transaction {
+  id                 String          @id @default(uuid())
+  type               TransactionType
+  // Amount in minor units (cents); always positive.
+  amount             BigInt
+  // Running balance of `account` after this transaction was applied.
+  balanceAfter       BigInt
+  description        String?
+  account            Account         @relation("AccountTransactions", fields: [accountId], references: [id], onDelete: Cascade)
+  accountId          String
+  // For transfers: the account on the other side of the operation.
+  counterpartAccount Account?        @relation("CounterpartAccount", fields: [counterpartId], references: [id])
+  counterpartId      String?
+  createdAt          DateTime        @default(now())
+
+  @@index([accountId])
+  @@index([createdAt])
+}
