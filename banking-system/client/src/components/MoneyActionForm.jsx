@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import {
-  DEPOSIT,
-  WITHDRAW,
-  TRANSFER,
-  ACCOUNTS,
-  TRANSACTIONS,
-} from '../graphql/operations.js';
+import { DEPOSIT, WITHDRAW, TRANSFER } from '../graphql/operations.js';
 
 const MUTATIONS = { deposit: DEPOSIT, withdraw: WITHDRAW, transfer: TRANSFER };
 
@@ -17,7 +11,9 @@ export default function MoneyActionForm({ action, account, onDone }) {
   const [toAccountNumber, setToAccountNumber] = useState('');
 
   const [mutate, { loading, error }] = useMutation(MUTATIONS[action], {
-    refetchQueries: [{ query: ACCOUNTS }, { query: TRANSACTIONS }],
+    // Refetch by operation name so active queries are refreshed with their
+    // current variables (e.g. the dashboard's paginated recent-transactions).
+    refetchQueries: ['Accounts', 'Transactions', 'Account'],
     onCompleted: onDone,
   });
 
